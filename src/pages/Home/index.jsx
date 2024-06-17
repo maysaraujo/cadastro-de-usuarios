@@ -1,30 +1,51 @@
+import { useEffect, useRef, useState } from 'react';
 import './style.css';
 import Trash from '../../assets/trash.svg';
+import api from '../../services/api';
 
 function Home() {
-  const users = [
-    {
-      id: '234asdasd',
-      name: 'Maysa',
-      age: 20,
-      email: 'maysa@email.com',
-    },
-    {
-      id: '56765asdfsd',
-      name: 'João',
-      age: 22,
-      email: 'joao@email.com',
-    },
-  ];
+  const [users, setUsers] = useState([]);
+
+  const inputName = useRef();
+  const inputAge = useRef();
+  const inputEmail = useRef();
+
+  async function getUsers() {
+    const usersFromApi = await api.get('/usuarios');
+
+    setUsers(usersFromApi.data);
+  }
+
+  async function createUsers() {
+    await api.post('/usuarios', {
+      name: inputName.current.value,
+      age: inputAge.current.value,
+      email: inputEmail.current.value,
+    });
+
+    getUsers();
+  }
+
+  async function deleteUsers(id) {
+    await api.delete(`/usuarios/${id}`);
+
+    getUsers();
+  }
+
+  useEffect(() => {
+    getUsers();
+  }, []);
 
   return (
     <div className='container'>
-      <form action='POST'>
+      <form>
         <h1>Cadastro de Usuários</h1>
-        <input name='name' type='text' placeholder='Nome' />
-        <input name='age' type='number' placeholder='Idade' />
-        <input name='email' type='email' placeholder='Email' />
-        <button type='button'>Cadastrar</button>
+        <input name='name' type='text' placeholder='Nome' ref={inputName} />
+        <input name='age' type='number' placeholder='Idade' ref={inputAge} />
+        <input name='email' type='email' placeholder='Email' ref={inputEmail} />
+        <button type='button' onClick={createUsers}>
+          Cadastrar
+        </button>
       </form>
 
       {users.map((user) => (
@@ -40,7 +61,7 @@ function Home() {
               Email: <span>{user.email}</span>{' '}
             </p>
           </div>
-          <button>
+          <button onClick={() => deleteUsers(user.id)}>
             <img src={Trash} alt='Trash icon' />
           </button>
         </div>

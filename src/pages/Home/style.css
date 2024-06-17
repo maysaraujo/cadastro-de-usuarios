@@ -79,3 +79,13 @@ form {
     opacity: 0.5;
   }
 }
+
+@media (max-width: 768px) {
+  form, .card {
+    max-width: 90%;
+  }
+
+  h1 {
+    line-height: 1.2;
+  }
+}
